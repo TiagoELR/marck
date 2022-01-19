@@ -12,9 +12,11 @@ import {
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {setList} from '../redux/actions';
+import {falarPlacar, isVencedor, isCampeao} from '../functions/functions';
 import Tts from 'react-native-tts';
 
 export const Marcador = ({navigation}) => {
+  Tts.setDefaultLanguage('pt-BR');
   const image = require('../assets/fundo.jpg');
   const [id, setId] = useState(1);
   const [ptNos, setPtNos] = useState(0);
@@ -26,8 +28,6 @@ export const Marcador = ({navigation}) => {
   const [modalText, setModalText] = useState('');
   const {list} = useSelector(state => state.listReducer);
   const dispatch = useDispatch();
-
-  Tts.setDefaultLanguage('pt-BR');
 
   const logList = (team, before, after, ponto) => {
     setId(id + 1);
@@ -45,79 +45,60 @@ export const Marcador = ({navigation}) => {
       ]),
     );
   };
-  const falarPlacar = (team, nPonto) => {
-    if (team === 'Nós') {
-      Tts.speak(
-        nPonto +
-          ' Ponto para ' +
-          team +
-          ' o placar está ' +
-          (ptNos + nPonto) +
-          ' a ' +
-          ptEles,
-      );
-    } else {
-      Tts.speak(
-        nPonto +
-          ' Ponto para ' +
-          team +
-          ' o placar está ' +
-          (ptEles + nPonto) +
-          ' a ' +
-          ptNos,
-      );
-    }
-  };
 
   const onMarcarUmPontoParaNos = () => {
-    falarPlacar('Nós', 1);
     if (isVencedor(ptNos + 1)) {
       logList('Nós', ptNos, ptNos + 1, 1);
       setPlNos(plNos + 1);
-      isCampeao(plNos + 1, plEles);
+      Tts.speak('Nós vencemos essa!');
+      declararCampeao(plNos + 1, plEles);
       onZerarPontos();
       showModel('Nós');
       return;
     }
+    falarPlacar('Nós', 1, ptNos, ptEles);
     setPtNos(ptNos + 1);
     logList('Nós', ptNos, ptNos + 1, 1);
   };
   const onMarcarUmPontoParaEles = () => {
-    falarPlacar('Eles', 1);
     if (isVencedor(ptEles + 1)) {
       logList('Eles', ptEles, ptEles + 1, 1);
       setPlEles(plEles + 1);
-      isCampeao(plNos, plEles + 1);
+      Tts.speak('Eles venceram essa!');
+      declararCampeao(plNos, plEles + 1);
       onZerarPontos();
       showModel('Eles');
       return;
     }
+    falarPlacar('Eles', 1, ptNos, ptEles);
     setPtEles(ptEles + 1);
     logList('Eles', ptEles, ptEles + 1, 1);
   };
   const onMarcarTresPontoParaNos = () => {
-    falarPlacar('Nós', 3);
     if (isVencedor(ptNos + 3)) {
       logList('Nós', ptNos, ptNos + 3, 3);
       setPlNos(plNos + 1);
-      isCampeao(plNos + 1, plEles);
+      Tts.speak('Nós vencemos essa!');
+      declararCampeao(plNos + 1, plEles);
       onZerarPontos();
       showModel('Nós');
       return;
     }
+    falarPlacar('Nós', 3, ptNos, ptEles);
     setPtNos(ptNos + 3);
     logList('Nós', ptNos, ptNos + 3, 3);
   };
   const onMarcarTresPontoParaEles = () => {
-    falarPlacar('Eles', 3);
     if (isVencedor(ptEles + 3)) {
       logList('Eles', ptEles, ptEles + 3, 3);
       setPlEles(plEles + 1);
-      isCampeao(plNos, plEles + 1);
+      Tts.speak('Eles venceram essa!');
+      declararCampeao(plNos, plEles + 1);
       onZerarPontos();
       showModel('Eles');
       return;
     }
+    falarPlacar('Eles', 3, ptNos, ptEles);
     setPtEles(ptEles + 3);
     logList('Eles', ptEles, ptEles + 3, 3);
   };
@@ -134,20 +115,14 @@ export const Marcador = ({navigation}) => {
     }
   };
   const onZerarPontos = () => {
-    Tts.speak('Pontos zerados!');
     setPtNos(0);
     setPtEles(0);
   };
   const onZerarPlacar = () => {
-    Tts.speak('Placar zerado!');
     setPlNos(0);
     setPlEles(0);
   };
-  const isVencedor = ponto => {
-    if (ponto >= 12) {
-      return true;
-    }
-  };
+
   const showModel = team => {
     setModalText(team);
     setModalVisible(true);
@@ -156,18 +131,19 @@ export const Marcador = ({navigation}) => {
       setModalTextCab('Vencedor');
     }, 5000);
   };
-  const isCampeao = (a, b) => {
-    if ((a === 2 && b === 0) || (a === 2 && b === 1)) {
-      onZerarPontos();
+  const declararCampeao = (a, b) => {
+    if (isCampeao(a, b)) {
       setPlNos(0);
       setPlEles(0);
       setModalTextCab('Campeão');
+      Tts.speak('Nós somos os campeões!');
       showModel('Nós');
-    } else if ((a === 0 && b === 2) || (a === 1 && b === 2)) {
-      onZerarPontos();
+    }
+    if (isCampeao(b, a)) {
       setPlNos(0);
       setPlEles(0);
       setModalTextCab('Campeão');
+      Tts.speak('Eles são os campeões!');
       showModel('Eles');
     }
   };
