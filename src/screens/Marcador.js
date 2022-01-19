@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   },
   txtButton: {
     fontFamily: 'arial',
-    fontSize: 40,
+    fontSize: 30,
     textAlignVertical: 'center',
     backgroundColor: '#800000',
     padding: 20,
