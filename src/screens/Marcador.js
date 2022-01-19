@@ -151,7 +151,7 @@ export const Marcador = ({navigation}) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.mainScreen}>
-        <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        <Modal animationType="fade" transparent={true} visible={modalVisible}>
           <View style={styles.modalView}>
             <View style={styles.modalViewCard}>
               <Text style={styles.txt}>{modalTextCab}</Text>
